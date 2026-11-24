@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNO! — Card Game</title>
+<style>
+:root{--bg:#101522;--panel:#1b2435;--panel2:#222e43;--text:#f7f8fc;--muted:#aab4c8;--accent:#ffd447;--red:#f04452;--blue:#2879ed;--green:#18a86b;--yellow:#f4c430}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -20%,#2b3b5a 0,#101522 55%);font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--text);min-height:100vh}
+button,select,input{font:inherit}button{cursor:pointer;border:0}
+.top{max-width:1180px;margin:auto;padding:22px 22px 10px;display:flex;align-items:center;justify-content:space-between;gap:15px}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#ffdc45,#ff8a35);display:grid;place-items:center;color:#171b27;font-weight:1000;font-size:25px;transform:rotate(-8deg);box-shadow:0 8px 25px #0005}.brand h1{margin:0;font-size:25px;letter-spacing:1px}.brand small{color:var(--muted)}
+.pill{background:#ffffff12;border:1px solid #ffffff1a;border-radius:999px;padding:9px 14px;color:var(--muted);font-size:13px}
+main{max-width:1180px;margin:auto;padding:14px 22px 35px}.setup{max-width:560px;margin:35px auto;background:#1b2435eF;border:1px solid #ffffff1c;border-radius:24px;padding:28px;box-shadow:0 25px 80px #0006}
+.setup h2{font-size:28px;margin:0 0 8px}.sub{color:var(--muted);line-height:1.5;margin:0 0 23px}.field{display:grid;gap:8px;margin:16px 0}.field label{font-weight:700;font-size:14px}.field select,.field input{width:100%;padding:13px 14px;border-radius:12px;border:1px solid #ffffff25;background:#111a2a;color:white;outline:none}
+.primary{background:linear-gradient(135deg,#ffdf55,#ffb52f);color:#1b1d25;font-weight:900;padding:14px 20px;border-radius:13px;box-shadow:0 8px 22px #f5bd3430;transition:.2s}.primary:hover{transform:translateY(-2px);filter:brightness(1.05)}.secondary{background:#ffffff12;border:1px solid #ffffff24;color:white;padding:11px 15px;border-radius:12px;font-weight:700}.danger{background:#ef4554;color:white;padding:11px 15px;border-radius:12px;font-weight:800}
+.how{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:22px}.how div{background:#ffffff09;padding:12px;border-radius:13px;color:var(--muted);font-size:12px;line-height:1.4}.how b{display:block;color:white;font-size:13px;margin-bottom:4px}
+.game{display:none}.toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:12px 0 18px}.toolbar-left,.toolbar-right{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.table{background:linear-gradient(145deg,#155d50,#10483f);border:9px solid #754a2b;border-radius:34px;min-height:340px;padding:18px 20px;box-shadow:inset 0 0 0 2px #ffffff25,0 18px 45px #0005;position:relative;overflow:hidden}
+.table:before{content:"";position:absolute;inset:10px;border:2px dashed #ffffff24;border-radius:25px;pointer-events:none}
+.opponents{display:flex;justify-content:center;gap:15px;flex-wrap:wrap;position:relative;z-index:1;min-height:86px}
+.opponent{background:#071f1c77;border:1px solid #ffffff24;border-radius:14px;padding:9px 13px;min-width:115px;text-align:center}.opponent.active{outline:2px solid var(--accent);box-shadow:0 0 18px #ffda4b55}.opponent .name{font-weight:800;font-size:13px}.opponent .count{color:#d6e5df;font-size:12px;margin-top:3px}
+.center{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:35px;min-height:190px}.pile{text-align:center}.pile small{display:block;color:#d8eee7;margin-bottom:8px;font-weight:700;letter-spacing:.5px}.pile-cards{display:flex;gap:12px;align-items:center}
+.card{width:82px;height:119px;border-radius:12px;border:3px solid #fff;position:relative;display:flex;align-items:center;justify-content:center;color:white;font-weight:1000;font-size:33px;text-shadow:1px 2px 2px #0007;box-shadow:0 6px 12px #0005;flex-shrink:0;user-select:none;overflow:hidden}
+.card:before{content:"";position:absolute;width:58px;height:88px;border:3px solid #ffffffb8;border-radius:50%;transform:rotate(-32deg);background:#ffffff18}.card span{position:relative;z-index:1}.card .corner{position:absolute;z-index:2;font-size:13px;top:5px;left:7px;text-shadow:none}.card .corner.bottom{top:auto;left:auto;right:7px;bottom:5px;transform:rotate(180deg)}
+.red{background:linear-gradient(145deg,#ff5863,#cf142f)}.blue{background:linear-gradient(145deg,#438fff,#1554c9)}.green{background:linear-gradient(145deg,#28c984,#087b50)}.yellow{background:linear-gradient(145deg,#ffe65a,#e7a900);color:#252525;text-shadow:none}.black{background:linear-gradient(145deg,#41485a,#111722)}
+.back{background:linear-gradient(145deg,#333d55,#121927);border-color:#f6d44a}.back:before{background:linear-gradient(135deg,#ed334a,#f5c82c,#236de1);border:0;width:48px;height:76px}
+.status{text-align:center;color:#f4fff9;font-weight:800;font-size:14px;min-height:22px;margin:4px 0 0;position:relative;z-index:1}
+.hand-area{margin-top:20px;background:#1b2435;border:1px solid #ffffff18;border-radius:22px;padding:16px 18px}.hand-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.hand-head h3{margin:0;font-size:16px}.hand-head span{font-size:12px;color:var(--muted)}
+.hand{display:flex;justify-content:center;align-items:flex-end;gap:8px;min-height:140px;padding:17px 4px 5px;overflow-x:auto}
+.hand .card{width:72px;height:105px;font-size:29px;cursor:pointer;transition:transform .15s,filter .15s;margin:0 -2px}.hand .card:hover{transform:translateY(-12px);filter:brightness(1.12)}.hand .card.disabled{filter:grayscale(.55) brightness(.65);cursor:not-allowed;opacity:.75}.hand .card.disabled:hover{transform:none}
+.actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:12px}.actions button:disabled{opacity:.4;cursor:not-allowed}
+.color-choices{display:none;position:fixed;inset:0;background:#050914bd;z-index:10;place-items:center;padding:20px}.color-box{background:#202b40;border:1px solid #ffffff2a;border-radius:22px;padding:24px;text-align:center;max-width:360px;width:100%}.color-box h3{margin:0 0 16px}.colors{display:grid;grid-template-columns:1fr 1fr;gap:12px}.color-btn{height:66px;border-radius:14px;color:white;font-weight:900;border:3px solid #ffffff55}.color-btn.yellow{color:#222}
+.notice{color:#ffdf69;font-size:12px;text-align:center;margin-top:10px}.footer{text-align:center;color:#75829b;font-size:12px;margin-top:18px}
+@media(max-width:650px){.top{padding:16px}.brand h1{font-size:21px}main{padding:8px 12px 25px}.setup{margin:18px auto;padding:21px}.how{grid-template-columns:1fr}.table{padding:14px 10px;min-height:320px;border-width:6px}.center{gap:18px;min-height:175px}.card{width:68px;height:100px;font-size:27px}.hand .card{width:61px;height:91px;font-size:25px}.hand{justify-content:flex-start}.opponent{min-width:90px}.pile-cards{gap:6px}}
+</style>
+</head>
+<body>
+<header class="top">
+ <div class="brand"><div class="logo">UNO</div><div><h1>UNO! <span style="color:#ffd447">CLUB</span></h1><small>Classic card game</small></div></div>
+ <div class="pill">♠ Main bareng, seru bareng</div>
+</header>
+<main>
+<section class="setup" id="setup">
+ <h2>Siap bermain? <span style="color:#ffd447">🃏</span></h2>
+ <p class="sub">Pilih mode permainanmu. Cocokkan warna atau angka, gunakan kartu aksi, dan jadilah pemain pertama yang menghabiskan kartu!</p>
+ <div class="field"><label for="mode">Mode permainan</label><select id="mode"><option value="cpu">Lawan komputer</option><option value="local">Bermain bersama teman (1 perangkat)</option></select></div>
+ <div class="field" id="countField"><label for="count">Jumlah pemain</label><select id="count"><option value="2">2 pemain</option><option value="3">3 pemain</option><option value="4" selected>4 pemain</option></select></div>
+ <div class="field"><label for="playerName">Nama kamu</label><input id="playerName" maxlength="14" value="Kamu" placeholder="Masukkan nama"></div>
+ <button class="primary" style="width:100%" id="startBtn">MULAI BERMAIN →</button>
+ <div class="how"><div><b>🎯 Tujuan</b>Habiskan semua kartu lebih dulu.</div><div><b>🎨 Cocokkan</b>Warna, angka, atau simbol.</div><div><b>📣 Jangan lupa UNO!</b>Tekan UNO saat kartu tersisa satu.</div></div>
+ <p class="notice">Mode teman dimainkan bergantian pada satu perangkat. Serahkan layar ke pemain sesuai giliran.</p>
+</section>
+
+<section class="game" id="game">
+ <div class="toolbar">
+  <div class="toolbar-left"><span class="pill" id="modeLabel">Mode</span><span class="pill" id="turnLabel">Giliran: Kamu</span></div>
+  <div class="toolbar-right"><button class="secondary" id="rulesBtn">Cara bermain</button><button class="secondary" id="newBtn">Game baru</button><button class="danger" id="exitBtn">Keluar</button></div>
+ </div>
+ <div class="table">
+  <div class="opponents" id="opponents"></div>
+  <div class="center">
+   <div class="pile"><small>TUMPUKAN AMBIL</small><div class="pile-cards"><div class="card back" id="drawPile"><span>UNO</span></div></div></div>
+   <div class="pile"><small>KARTU TERATAS</small><div class="pile-cards" id="discardPile"></div></div>
+  </div>
+  <div class="status" id="status">Menyiapkan permainan...</div>
+ </div>
+ <div class="hand-area">
+  <div class="hand-head"><h3 id="handTitle">Kartu kamu</h3><span id="handCount"></span></div>
+  <div class="hand" id="hand"></div>
+  <div class="actions"><button class="primary" id="drawBtn">＋ Ambil kartu</button><button class="secondary" id="unoBtn">📣 UNO!</button><button class="secondary" id="passBtn" disabled>Lewati giliran</button></div>
+ </div>
+ <div class="footer">UNO! CLUB · Game kartu untuk bersenang-senang</div>
+</section>
+</main>
+<div class="color-choices" id="colorModal"><div class="color-box"><h3>Pilih warna berikutnya</h3><div class="colors">
+ <button class="color-btn red" data-color="red">MERAH</button><button class="color-btn blue" data-color="blue">BIRU</button><button class="color-btn green" data-color="green">HIJAU</button><button class="color-btn yellow" data-color="yellow">KUNING</button>
+ </div></div></div>
+<script>
+const COLORS=['red','blue','green','yellow'];
+const COLOR_NAMES={red:'Merah',blue:'Biru',green:'Hijau',yellow:'Kuning'};
+let players=[],deck=[],discard=[],current=0,direction=1,activeColor='',mode='cpu',pendingWild=null,drawnCardId=null,gameOver=false,unoCalled=false,turnMessage='';
+let uid=0;
+const $=id=>document.getElementById(id);
+function makeCard(color,value){return {id:++uid,color,value};}
+function buildDeck(){
+ let d=[];
+ COLORS.forEach(c=>{
+  d.push(makeCard(c,'0'));
+  for(let n=1;n<=9;n++){d.push(makeCard(c,String(n)));d.push(makeCard(c,String(n)));}
+  ['Skip','Reverse','+2'].forEach(v=>{d.push(makeCard(c,v));d.push(makeCard(c,v));});
+ });
+ for(let i=0;i<4;i++){d.push(makeCard('black','Wild'));d.push(makeCard('black','+4'));}
+ return shuffle(d);
+}
+function shuffle(a){for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function startGame(){
+ mode=$('mode').value;let count=mode==='cpu'?2:Number($('count').value);
+ let name=$('playerName').value.trim()||'Kamu';
+ players=[{name,hand:[],human:true}];
+ for(let i=1;i<count;i++)players.push({name:mode==='cpu'?'Komputer':`Pemain ${i+1}`,hand:[],human:mode==='local'?true:false});
+ deck=buildDeck();discard=[];current=0;direction=1;gameOver=false;unoCalled=false;drawnCardId=null;turnMessage='';
+ players.forEach(p=>{for(let i=0;i<7;i++)p.hand.push(drawFromDeck());});
+ let first=drawFromDeck();while(first.color==='black'){deck.unshift(first);first=drawFromDeck();}
+ discard.push(first);activeColor=first.color;
+ $('setup').style.display='none';$('game').style.display='block';
+ $('modeLabel').textContent=mode==='cpu'?'🤖 Lawan komputer':'👥 '+count+' pemain';
+ $('status').textContent=`Permainan dimulai! Warna ${COLOR_NAMES[activeColor]}.`;
+ render();if(!players[current].human)cpuTurn();
+}
+function drawFromDeck(){if(!deck.length){if(discard.length>1){let top=discard.pop();deck=shuffle(discard);discard=[top];}else return makeCard(COLORS[Math.floor(Math.random()*4)],String(Math.floor(Math.random()*10)));}return deck.pop();}
+function topCard(){return discard[discard.length-1];}
+function canPlay(card){let top=topCard();return card.color==='black'||card.color===activeColor||card.value===top.value;}
+function nextIndex(from=current,steps=1){return (from+direction*steps+players.length*10)%players.length;}
+function cardLabel(v){return v==='Reverse'?'↶':v==='Skip'?'⊘':v==='+2'?'+2':v==='+4'?'+4':v==='Wild'?'✦':v;}
+function cardElement(card,clickable=false,disabled=false){
+ let el=document.createElement('div');el.className=`card ${card.color}`+(disabled?' disabled':'');
+ el.innerHTML=`<span class="corner">${cardLabel(card.value)}</span><span>${cardLabel(card.value)}</span><span class="corner bottom">${cardLabel(card.value)}</span>`;
+ if(clickable){el.addEventListener('click',()=>playCard(card.id));}
+ return el;
+}
+function render(){
+ if(gameOver)return;
+ $('turnLabel').textContent=`Giliran: ${players[current].name}`;
+ $('opponents').innerHTML='';
+ players.forEach((p,i)=>{if(i===0&&mode==='cpu')return;let div=document.createElement('div');div.className='opponent'+(i===current?' active':'');div.innerHTML=`<div class="name">${p.name} ${i===current?'•':' '}</div><div class="count">🂠 ${p.hand.length} kartu</div>`;$('opponents').appendChild(div);});
+ $('discardPile').innerHTML='';$('discardPile').appendChild(cardElement(topCard()));
+ $('hand').innerHTML='';let p=players[0];
+ $('handTitle').textContent=mode==='local'&&current!==0?`Kartu ${players[current].name}`:'Kartu '+players[0].name;
+ $('handCount').textContent=`${p.hand.length} kartu tersisa`;
+ let handPlayer=players[current].human?players[current]:players[0];
+ if(mode==='local'){handPlayer=players[current];$('handTitle').textContent=`Kartu ${handPlayer.name}`;$('handCount').textContent=`${handPlayer.hand.length} kartu tersisa`;}
+ handPlayer.hand.forEach(c=>{$('hand').appendChild(cardElement(c,true,!players[current].human||!canPlay(c)));});
+ $('drawBtn').disabled=!players[current].human||gameOver;
+ $('unoBtn').disabled=!players[current].human||gameOver||handPlayer.hand.length!==1;
+ $('passBtn').disabled=!players[current].human||!drawnCardId;
+ $('status').textContent=turnMessage||`${players[current].name}, cocokkan warna ${COLOR_NAMES[activeColor]} atau simbol ${cardLabel(topCard().value)}.`;
+}
+function playCard(id){
+ if(gameOver||!players[current].human)return;
+ let p=players[current],idx=p.hand.findIndex(c=>c.id===id);if(idx<0)return;
+ let card=p.hand[idx];if(!canPlay(card))return;
+ if(card.color==='black'){pendingWild={player:current,card};$('colorModal').style.display='grid';return;}
+ commitCard(card);
+}
+function commitCard(card,chosenColor=null){
+ let p=players[current];let idx=p.hand.findIndex(c=>c.id===card.id);if(idx<0)return;
+ p.hand.splice(idx,1);discard.push(card);activeColor=chosenColor||card.color;drawnCardId=null;unoCalled=false;
+ if(p.hand.length===0){endGame(current);return;}
+ let msg=`${p.name} memainkan ${cardLabel(card.value)}.`;
+ let steps=1;
+ if(card.value==='Skip'){steps=2;msg+=' Giliran berikutnya dilewati.';}
+ if(card.value==='Reverse'){direction*=-1;msg+=' Arah permainan berbalik.';if(players.length===2)steps=2;}
+ if(card.value==='+2'){let target=nextIndex();for(let i=0;i<2;i++)players[target].hand.push(drawFromDeck());steps=2;msg+=` ${players[target].name} mengambil 2 kartu.`;}
+ if(card.value==='+4'){let target=nextIndex();for(let i=0;i<4;i++)players[target].hand.push(drawFromDeck());steps=2;msg+=` ${players[target].name} mengambil 4 kartu.`;}
+ if(card.color==='black')msg+=` Warna berubah menjadi ${COLOR_NAMES[activeColor]}.`;
+ current=nextIndex(current,steps);turnMessage=msg;render();
+ if(!players[current].human)setTimeout(cpuTurn,850);
+}
+function chooseColor(color){$('colorModal').style.display='none';if(!pendingWild)return;let card=pendingWild.card;pendingWild=null;commitCard(card,color);}
+document.querySelectorAll('.color-btn').forEach(b=>b.addEventListener('click',()=>chooseColor(b.dataset.color)));
+function drawCard(){
+ if(gameOver||!players[current].human)return;
+ let p=players[current];let c=drawFromDeck();p.hand.push(c);drawnCardId=c.id;turnMessage=`${p.name} mengambil satu kartu.`;
+ render();
+ if(!canPlay(c)){setTimeout(()=>{if(!gameOver&&drawnCardId===c.id)passTurn();},650);}
+}
+function passTurn(){if(!players[current].human||!drawnCardId)return;drawnCardId=null;current=nextIndex();turnMessage='Giliran berpindah.';render();if(!players[current].human)setTimeout(cpuTurn,850);}
+function callUno(){
+ let p=players[current];let h=mode==='local'?p.hand:players[0].hand;
+ if(h.length===1){unoCalled=true;turnMessage=`${p.name} mengatakan UNO!`;render();}
+}
+function cpuTurn(){
+ if(gameOver||players[current].human)return;
+ let p=players[current];let playable=p.hand.filter(canPlay);
+ let chosen=playable.find(c=>c.color!=='black'&&['+2','Skip','Reverse'].includes(c.value))||playable.find(c=>c.color!=='black')||playable[0];
+ if(chosen){
+  let color=chosen.color==='black'?COLORS.sort((a,b)=>p.hand.filter(c=>c.color===b).length-p.hand.filter(c=>c.color===a).length)[0]:null;
+  commitCard(chosen,color);
+ }else{
+  let c=drawFromDeck();p.hand.push(c);turnMessage='Komputer mengambil satu kartu.';
+  if(canPlay(c)){render();setTimeout(()=>{if(!gameOver&&current===players.indexOf(p))commitCard(c);},650);}
+  else{render();setTimeout(()=>{if(!gameOver&&current===players.indexOf(p)){current=nextIndex();turnMessage='Komputer melewati giliran.';render();if(!players[current].human)setTimeout(cpuTurn,850);}},650);}
+ }
+}
+function endGame(winner){
+ gameOver=true;render();
+ let msg=players[winner].name+' menang! 🎉';
+ $('status').textContent=msg;
+ setTimeout(()=>{alert(msg);$('game').style.display='none';$('setup').style.display='block';},300);
+}
+$('startBtn').addEventListener('click',startGame);
+$('drawBtn').addEventListener('click',drawCard);
+$('passBtn').addEventListener('click',passTurn);
+$('unoBtn').addEventListener('click',callUno);
+$('newBtn').addEventListener('click',()=>{if(confirm('Mulai permainan baru?'))startGame();});
+$('exitBtn').addEventListener('click',()=>{if(confirm('Keluar dari permainan?')){$('game').style.display='none';$('setup').style.display='block';}});
+$('rulesBtn').addEventListener('click',()=>alert('CARA BERMAIN UNO\\n\\n1. Setiap pemain mendapat 7 kartu.\\n2. Cocokkan warna atau angka/simbol kartu teratas.\\n3. Jika tidak punya kartu yang cocok, ambil satu kartu.\\n4. Skip melewati giliran, Reverse membalik arah, +2 dan +4 membuat pemain berikutnya mengambil kartu.\\n5. Wild dapat mengubah warna.\\n6. Tekan UNO saat tersisa satu kartu.\\n7. Pemain pertama yang menghabiskan kartu menang!'));
+$('mode').addEventListener('change',()=>{$('countField').style.display=$('mode').value==='cpu'?'none':'grid';});
+$('countField').style.display='none';
+</script>
+</body>
+</html>
